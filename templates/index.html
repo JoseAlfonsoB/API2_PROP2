@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Calculadora de Ruta TSP</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Ruta Óptima (TSP + Hill Climbing)</h1>
+
+      <h2>Ciudades Iniciales:</h2>
+      <table class="tabla-ciudades">
+        <tbody>
+          <tr>
+            <td>Jiloyork</td>
+            <td>Toluca</td>
+            <td>Atlacomulco</td>
+          </tr>
+          <tr>
+            <td>Guadalajara</td>
+            <td>Monterrey</td>
+            <td>QuintanaRoo</td>
+          </tr>
+          <tr>
+            <td>Michohacan</td>
+            <td>Aguascalientes</td>
+            <td>CDMX</td>
+          </tr>
+          <tr>
+            <td>QRO</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="inputs">
+        <input id="nombre" placeholder="Nombre ciudad" />
+        <input id="lat" placeholder="Latitud" type="number" step="any" />
+        <input id="lon" placeholder="Longitud" type="number" step="any" />
+        <button onclick="agregarCiudad()">Agregar Ciudad</button>
+      </div>
+
+      <button onclick="calcularRuta()">Calcular Ruta</button>
+
+      <div class="output">
+        <h2>Ruta:</h2>
+        <ul id="ruta-list"></ul>
+        <h2>Distancia total:</h2>
+        <p id="distancia"></p>
+      </div>
+    </div>
+
+    <script>
+      const nuevasCiudades = [];
+
+      function agregarCiudad() {
+        const nombre = document.getElementById("nombre").value;
+        const lat = document.getElementById("lat").value;
+        const lon = document.getElementById("lon").value;
+
+        if (nombre && lat && lon) {
+          nuevasCiudades.push({ nombre, lat, lon });
+          alert("Ciudad agregada: " + nombre);
+        }
+      }
+
+      function calcularRuta() {
+        fetch("/ruta", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nuevas: nuevasCiudades }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            const rutaList = document.getElementById("ruta-list");
+            rutaList.innerHTML = "";
+            data.ruta.forEach((ciudad) => {
+              const li = document.createElement("li");
+              li.textContent = ciudad;
+              rutaList.appendChild(li);
+            });
+            document.getElementById("distancia").textContent =
+              data.distancia.toFixed(2) + " unidades";
+          });
+      }
+    </script>
+  </body>
+</html>
